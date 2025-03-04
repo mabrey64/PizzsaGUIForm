@@ -1,7 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * This class creates a GUI for a pizza order form.
+ * The user can select the size, crust, and toppings for their pizza.
+ * The user can also calculate the total price of the pizza.
+ * The user can also clear the form and exit the program.
+ */
 public class PizzaGUIFrame extends JFrame {
+    // Declare all the components
     JPanel mainPanel;
     JPanel crustPanel;
     JPanel sizePanel;
@@ -31,16 +38,24 @@ public class PizzaGUIFrame extends JFrame {
     JButton clearButton;
     JButton exitButton;
 
+    // Declare variables to store the prices
     public int crustPrice;
     public int sizePrice;
     public int toppingsPrice;
     public double total;
     public double tax = .07;
 
+    /**
+     * Constructor for the PizzaGUIFrame class.
+     * This constructor creates the GUI for the pizza order form.
+     * It creates the size, crust, toppings, and button panels.
+     * GridBagLayout is used to layout the components in the frame, which is a new component that I learned about while working on this project.
+     */
     public PizzaGUIFrame() {
         mainPanel = new JPanel();
         mainPanel.setLayout(new GridBagLayout());
 
+        // Create a new GridBagConstraints object to layout the components
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 5, 5);
@@ -49,7 +64,9 @@ public class PizzaGUIFrame extends JFrame {
         createSizePanel();
         createToppingsPanel();
         createButtonPanel();
+        createTotalPanel();
 
+        // Then each panel gets a GridBagConstraints object to layout the components, which are then added to the mainPanel
         c.gridx = 0;
         c.gridy = 0;
         c.weightx = 1;
@@ -72,15 +89,27 @@ public class PizzaGUIFrame extends JFrame {
         c.gridy = 1;
         c.gridwidth = 3;
         c.weightx = 1;
+        c.weighty = 0.1;
+        mainPanel.add(totalPanel, c);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 3;
+        c.weightx = 1;
         c.weighty = 1;
         mainPanel.add(buttonPanel, c);
 
         setTitle("Pizza Order");
-        setSize(800, 400);
+        setSize(800, 600);
         add(mainPanel);
         setVisible(true);
     }
 
+
+    /**
+     * This method creates the size panel for the pizza order form.
+     * It creates a title label, a combo box for the pizza size, and adds them to the size panel.
+     */
     public void createSizePanel() {
         sizePanel = new JPanel();
         sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.Y_AXIS));
@@ -101,6 +130,10 @@ public class PizzaGUIFrame extends JFrame {
         mainPanel.add(sizePanel);
     }
 
+    /**
+     * This method creates the crust panel for the pizza order form.
+     * It creates a title label, radio buttons for the crust options, and adds them to the crust panel.
+     */
     public void createCrustPanel()
     {
         crustPanel = new JPanel();
@@ -127,6 +160,10 @@ public class PizzaGUIFrame extends JFrame {
         mainPanel.add(crustPanel);
     }
 
+    /**
+     * This method creates the toppings panel for the pizza order form.
+     * It creates a title label, check boxes for the toppings options, and adds them to the toppings panel.
+     */
     public void createToppingsPanel() {
         toppingsPanel = new JPanel();
         toppingsPanel.setLayout(new BoxLayout(toppingsPanel, BoxLayout.Y_AXIS));
@@ -154,6 +191,11 @@ public class PizzaGUIFrame extends JFrame {
         mainPanel.add(toppingsPanel);
     }
 
+    /**
+     * This method creates the button panel for the pizza order form.
+     * It creates buttons for ordering, clearing the form, and exiting the program.
+     * Rigid areas are added to space out the buttons.
+     */
     public void createButtonPanel() {
         buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -191,6 +233,21 @@ public class PizzaGUIFrame extends JFrame {
         mainPanel.add(buttonPanel);
     }
 
+    /**
+     * This method creates the total panel for the pizza order form.
+     * It creates a text area for the receipt and adds it to the total panel.
+     */
+    private void createTotalPanel()
+    {
+        totalPanel = new JPanel();
+        totalPanel.setBorder(BorderFactory.createTitledBorder("Total"));
+        totalPanel.setLayout(new BorderLayout());
+    }
+
+    /**
+     * This method calculates the price of the crust based on the selected radio button.
+     * It returns the price of the crust.
+     */
     public int calculateCrustPrice() {
         if (thinCrustButton.isSelected()) {
             crustPrice = 5;
@@ -203,6 +260,10 @@ public class PizzaGUIFrame extends JFrame {
         return crustPrice;
     }
 
+    /**
+     * This method calculates the price of the size based on the selected combo box item.
+     * It returns the price of the size.
+     */
     public int calculateSizePrice() {
         if (pizzaSizeBox.getSelectedIndex() == 0) {
             sizePrice = 8;
@@ -217,6 +278,10 @@ public class PizzaGUIFrame extends JFrame {
         return sizePrice;
     }
 
+    /**
+     * This method calculates the price of the toppings based on the selected check boxes.
+     * It returns the price of the toppings.
+     */
     public int calculateToppingsPrice() {
         toppingsPrice = 0;
 
@@ -242,6 +307,7 @@ public class PizzaGUIFrame extends JFrame {
         return toppingsPrice;
     }
 
+
     // Calculate the price of the pizza
     public void calculateTotal()
     {
@@ -249,6 +315,10 @@ public class PizzaGUIFrame extends JFrame {
         total = (double) (total + (total * tax));
     }
 
+    /**
+     * This method displays the total price of the pizza in a text area.
+     * It calculates the total price of the pizza and displays it in the text area.
+     */
     public void displayTotal()
     {
         calculateTotal();
@@ -276,19 +346,18 @@ public class PizzaGUIFrame extends JFrame {
         receiptArea.setText(receipt.toString());
         receiptArea.setEditable(false);
 
-        totalPanel = new JPanel();
-        totalPanel.setLayout(new BorderLayout());
+        totalPanel.removeAll();
         totalPanel.add(new JScrollPane(receiptArea), BorderLayout.CENTER);
 
         GridBagConstraints c = new GridBagConstraints();
         c.gridx = 0;
-        c.gridy = 2;
+        c.gridy = 1;
         c.gridwidth = 3;
         c.weightx = 1;
         c.weighty = 1;
         c.fill = GridBagConstraints.BOTH;
         c.insets = new Insets(5, 5, 5, 5);
-        mainPanel.add(totalPanel);
+        mainPanel.add(totalPanel, c);
 
         mainPanel.revalidate();
         mainPanel.repaint();
