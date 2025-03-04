@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 
 public class PizzaGUIFrame extends JFrame {
     JPanel mainPanel;
@@ -10,13 +11,14 @@ public class PizzaGUIFrame extends JFrame {
 
     JLabel titleLabel;
 
-    JTextArea totalArea;
+    JTextArea receiptArea;
 
     JRadioButton thinCrustButton;
     JRadioButton regularCrustButton;
     JRadioButton deepDishCrustButton;
 
     JComboBox<String> pizzaSizeBox;
+    ButtonGroup crustGroup;
 
     JCheckBox pepperoniBox;
     JCheckBox sausageBox;
@@ -32,21 +34,71 @@ public class PizzaGUIFrame extends JFrame {
     public int crustPrice;
     public int sizePrice;
     public int toppingsPrice;
-    public int total;
+    public double total;
     public double tax = .07;
 
     public PizzaGUIFrame() {
         mainPanel = new JPanel();
-        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setLayout(new GridBagLayout());
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 5, 5, 5);
 
         createCrustPanel();
         createSizePanel();
         createToppingsPanel();
         createButtonPanel();
 
-        setTitle("Pizza Order");
-        setSize(400, 400);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        mainPanel.add(sizePanel, c);
 
+        c.gridx = 1;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        mainPanel.add(crustPanel, c);
+
+        c.gridx = 2;
+        c.gridy = 0;
+        c.weightx = 1;
+        c.weighty = 1;
+        mainPanel.add(toppingsPanel, c);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 3;
+        c.weightx = 1;
+        c.weighty = 1;
+        mainPanel.add(buttonPanel, c);
+
+        setTitle("Pizza Order");
+        setSize(800, 400);
+        add(mainPanel);
+        setVisible(true);
+    }
+
+    public void createSizePanel() {
+        sizePanel = new JPanel();
+        sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.Y_AXIS));
+
+        titleLabel = new JLabel("Size");
+        sizePanel.add(titleLabel);
+
+        String[] sizes = {"Small", "Medium", "Large"};
+        pizzaSizeBox = new JComboBox<String>(sizes);
+
+        pizzaSizeBox.setPreferredSize(new Dimension(100, 20));
+        pizzaSizeBox.setMaximumSize(new Dimension(200, 40));
+
+        sizePanel.setBorder(BorderFactory.createTitledBorder("Size"));
+        sizePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        sizePanel.add(pizzaSizeBox);
+
+        mainPanel.add(sizePanel);
     }
 
     public void createCrustPanel()
@@ -61,7 +113,7 @@ public class PizzaGUIFrame extends JFrame {
         regularCrustButton = new JRadioButton("Regular");
         deepDishCrustButton = new JRadioButton("Deep Dish");
 
-        ButtonGroup crustGroup = new ButtonGroup();
+        crustGroup = new ButtonGroup();
         crustGroup.add(thinCrustButton);
         crustGroup.add(regularCrustButton);
         crustGroup.add(deepDishCrustButton);
@@ -70,22 +122,9 @@ public class PizzaGUIFrame extends JFrame {
         crustPanel.add(regularCrustButton);
         crustPanel.add(deepDishCrustButton);
 
+        crustPanel.setBorder(BorderFactory.createTitledBorder("Crust"));
+        crustPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mainPanel.add(crustPanel);
-    }
-
-    public void createSizePanel() {
-        sizePanel = new JPanel();
-        sizePanel.setLayout(new BoxLayout(sizePanel, BoxLayout.Y_AXIS));
-
-        titleLabel = new JLabel("Size");
-        sizePanel.add(titleLabel);
-
-        String[] sizes = {"Small", "Medium", "Large"};
-        pizzaSizeBox = new JComboBox<String>(sizes);
-
-        sizePanel.add(pizzaSizeBox);
-
-        mainPanel.add(sizePanel);
     }
 
     public void createToppingsPanel() {
@@ -109,22 +148,23 @@ public class PizzaGUIFrame extends JFrame {
         toppingsPanel.add(pineappleBox);
         toppingsPanel.add(chickenBox);
 
+        toppingsPanel.setBorder(BorderFactory.createTitledBorder("Toppings"));
+        toppingsPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
         mainPanel.add(toppingsPanel);
     }
 
     public void createButtonPanel() {
         buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.Y_AXIS));
+        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
 
         orderButton = new JButton("Order");
         clearButton = new JButton("Clear");
         exitButton = new JButton("Exit");
 
-        orderButton.addActionListener(e -> calculateTotal());
+        orderButton.addActionListener(e -> displayTotal());
         clearButton.addActionListener(e -> {
-            thinCrustButton.setSelected(false);
-            regularCrustButton.setSelected(false);
-            deepDishCrustButton.setSelected(false);
+            crustGroup.clearSelection();
             pizzaSizeBox.setSelectedIndex(0);
             pepperoniBox.setSelected(false);
             sausageBox.setSelected(false);
@@ -132,11 +172,20 @@ public class PizzaGUIFrame extends JFrame {
             taterTotsBox.setSelected(false);
             pineappleBox.setSelected(false);
             chickenBox.setSelected(false);
+            mainPanel.remove(totalPanel);
+            mainPanel.revalidate();
+            mainPanel.repaint();
         });
-        exitButton.addActionListener(e -> System.exit(0));
-
+        exitButton.addActionListener(e -> {
+            int response = JOptionPane.showConfirmDialog(null, "Would you like to exit the program?", "Exit", JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.YES_OPTION) {
+                System.exit(0);
+            }
+        });
         buttonPanel.add(orderButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(150, 0)));
         buttonPanel.add(clearButton);
+        buttonPanel.add(Box.createRigidArea(new Dimension(150, 0)));
         buttonPanel.add(exitButton);
 
         mainPanel.add(buttonPanel);
@@ -194,13 +243,54 @@ public class PizzaGUIFrame extends JFrame {
     }
 
     // Calculate the price of the pizza
-    public int calculateTotal()
+    public void calculateTotal()
     {
-
+        total = calculateCrustPrice() + calculateSizePrice() + calculateToppingsPrice();
+        total = (double) (total + (total * tax));
     }
 
-    public returnTotal()
+    public void displayTotal()
     {
-        
+        calculateTotal();
+        receiptArea = new JTextArea();
+        StringBuilder receipt = new StringBuilder();
+
+        double crustPrice = calculateCrustPrice();
+        double sizePrice = calculateSizePrice();
+        double toppingsPrice = calculateToppingsPrice();
+        double subTotal = crustPrice + sizePrice + toppingsPrice;
+        double taxAmount = subTotal * tax;
+        double total = subTotal + taxAmount;
+
+        receipt.append("=====================================\n");
+        receipt.append(String.format("%-20s %10s\n", "Size", "$" + String.format("%.2f", sizePrice)));
+        receipt.append(String.format("%-20s %10s\n", "Crust", "$" + String.format("%.2f", crustPrice)));
+        receipt.append(String.format("%-20s %10s\n", "Toppings", "$" + String.format("%.2f", toppingsPrice)));
+        receipt.append("\n");
+        receipt.append(String.format("%-20s %10s\n", "Sub-total", "$" + String.format("%.2f", subTotal)));
+        receipt.append(String.format("%-20s %10s\n", "Tax", "$" + String.format("%.2f", taxAmount)));
+        receipt.append("-------------------------------------\n");
+        receipt.append(String.format("%-20s %10s\n", "Total", "$" + String.format("%.2f", total)));
+        receipt.append("=====================================\n");
+
+        receiptArea.setText(receipt.toString());
+        receiptArea.setEditable(false);
+
+        totalPanel = new JPanel();
+        totalPanel.setLayout(new BorderLayout());
+        totalPanel.add(new JScrollPane(receiptArea), BorderLayout.CENTER);
+
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 3;
+        c.weightx = 1;
+        c.weighty = 1;
+        c.fill = GridBagConstraints.BOTH;
+        c.insets = new Insets(5, 5, 5, 5);
+        mainPanel.add(totalPanel);
+
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 }
